@@ -1,5 +1,4 @@
 import speech_recognition as sr
-from ThijmAI.speaking.speak import *
 
 
 def user():
@@ -12,7 +11,6 @@ def user():
         print("Recognizing...")
         command = recognizer.recognize_google(audio)
         print(f"You said to me: {command}")
-        speak(command)
 
         return command.lower()
     except sr.UnknownValueError:
