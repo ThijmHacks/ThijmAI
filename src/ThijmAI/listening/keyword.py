@@ -1,6 +1,6 @@
 import speech_recognition as sr
 
-def keyword(keyword="assistant"):
+def keyword(keyword="Jarvis"):
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
         print("Enabled")
@@ -8,7 +8,7 @@ def keyword(keyword="assistant"):
 
     try:
         command = recognizer.recognize_google(audio)
-        if keyword.lower() in command:
+        if keyword.lower() in command.lower():
             return True
         return False
     except sr.UnknownValueError:

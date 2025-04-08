@@ -7,7 +7,8 @@ from ThijmAI.listening.keyword import *
 
 class ThijmAI():
     def __init__(self):
+        keywords = "jarvis"
         while True:
-            activated = keyword("laptop")
+            activated = keyword(keywords)
             if activated:
                 user()
