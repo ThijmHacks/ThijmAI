@@ -1,9 +1,20 @@
+from datetime import datetime
+
 from ThijmAI.speaking.speak import *
 
 def command(command):
+    command = command or ""
     if "time" in command:
-        output = "I cant tell you the time right now"
+        time = datetime.now()
+
+        output = "It is currently: " + time.strftime("%H:%M")
 
         print(output)
+        speak(output)
 
+
+    else:
+        output = f"You said to me: {command}"
+
+        print(output)
         speak(output)

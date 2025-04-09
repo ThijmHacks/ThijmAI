@@ -10,7 +10,6 @@ def user():
     try:
         print("Recognizing...")
         command = recognizer.recognize_google(audio)
-        print(f"You said to me: {command}")
 
         return command.lower()
     except sr.UnknownValueError:

@@ -1,6 +1,6 @@
 import speech_recognition as sr
 
-def keyword(keyword="Jarvis"):
+def keyword(keyword="friday"):
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
         print("Enabled")
