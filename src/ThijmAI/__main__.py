@@ -8,8 +8,9 @@ from ThijmAI.command.command import *
 
 class ThijmAI():
     def __init__(self):
+        program = True
         keywords = "friday"
-        while True:
+        while program:
             activated = keyword(keywords)
             if activated:
                 command_input = user()

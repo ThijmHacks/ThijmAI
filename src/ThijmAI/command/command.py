@@ -12,9 +12,19 @@ def command(command):
         print(output)
         speak(output)
 
+        return
+    if "what is" in command:
+        output = "I cannot search things currently"
+
+        print(output)
+        speak(output)
+
+        return
 
     else:
         output = f"You said to me: {command}"
 
         print(output)
         speak(output)
+
+        return
