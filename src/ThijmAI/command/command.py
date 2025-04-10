@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from ThijmAI.speaking.speak import *
+import ThijmAI.command.ai as ai
 
 def command(command):
     command = command or ""
@@ -14,6 +15,11 @@ def command(command):
 
         return
 
+    if "what is" in command:
+        output = ai.chat(command)
+
+        print(output)
+        speak(output)
     else:
 
 
