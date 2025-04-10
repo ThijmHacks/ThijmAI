@@ -27,11 +27,15 @@ def lights(command):
     if "off" in command:
         off_on = "turn_off"
     else:
-        sp.speak("What do you want to do with the lights?")
-        return False
+        off_on = "turn_on"
     data = {
         "entity_id": entity_id
     }
 
 
     response = requests.post(f"{HA_URL}/api/services/light/{off_on}", json=data, headers=headers)
+
+    if response.status_code == 200:
+        print("Successfully set the light with color, brightness, and temperature.")
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
