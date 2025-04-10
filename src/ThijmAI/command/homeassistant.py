@@ -2,6 +2,8 @@ import os
 import requests
 from dotenv import load_dotenv
 
+import ThijmAI.speaking.speak as sp
+
 load_dotenv()
 
 HA_URL = os.getenv("HA_URL")
@@ -17,16 +19,19 @@ headers = {
 }
 
 
-def homeassistant(command):
+def lights(command):
     entity_id = "light.kamer_thijmen"
 
+    if "on" in command:
+        off_on = "turn_on"
+    if "off" in command:
+        off_on = "turn_off"
+    else:
+        sp.speak("What do you want to do with the lights?")
+        return False
     data = {
         "entity_id": entity_id
     }
 
-    response = requests.post(f"{HA_URL}/api/services/light/turn_on", json=data, headers=headers)
 
-    if response.status_code == 200:
-        print(f"Successfully turned on {entity_id}")
-    else:
-        print(f"Error: {response.status_code} - {response.text}")
+    response = requests.post(f"{HA_URL}/api/services/light/{off_on}", json=data, headers=headers)

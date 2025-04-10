@@ -22,9 +22,12 @@ def command(command):
         print(output)
         speak(output)
 
+        return 
+
     if "lights" in command:
 
-        ha.homeassistant(command)
+        ha.lights(command)
+        return
 
     else:
 
