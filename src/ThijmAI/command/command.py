@@ -20,7 +20,17 @@ def command(command):
 
         print(output)
         speak(output)
+
+    if "what is" in command:
+
+
+        output = f"I will turn the lights on or off"
+
+        print(output)
+        speak(output)
+
     else:
+
 
 
         output = f"You said to me: {command}"
