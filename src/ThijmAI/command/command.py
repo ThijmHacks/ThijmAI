@@ -2,6 +2,7 @@ from datetime import datetime
 
 from ThijmAI.speaking.speak import *
 import ThijmAI.command.ai as ai
+import ThijmAI.command.homeassistant as ha
 
 def command(command):
     command = command or ""
@@ -21,17 +22,11 @@ def command(command):
         print(output)
         speak(output)
 
-    if "what is" in command:
+    if "lights" in command:
 
-
-        output = f"I will turn the lights on or off"
-
-        print(output)
-        speak(output)
+        ha.homeassistant(command)
 
     else:
-
-
 
         output = f"You said to me: {command}"
 
