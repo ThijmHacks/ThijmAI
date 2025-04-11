@@ -1,3 +1,4 @@
 ./models_ai
+./needs/ffmpeg.exe
 
 .env
