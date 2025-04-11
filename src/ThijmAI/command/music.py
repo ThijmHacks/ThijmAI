@@ -3,7 +3,9 @@ import yt_dlp
 import pygame
 import time
 import sys
+import threading
 from dotenv import load_dotenv
+from queue import Queue
 
 load_dotenv()
 
@@ -14,7 +16,6 @@ if not FFMPEG_PATH:
     exit(1)
 
 def suppress_pygame_init():
-
     old_stdout = sys.stdout
     sys.stdout = open(os.devnull, 'w')
     pygame.mixer.init()
@@ -22,13 +23,29 @@ def suppress_pygame_init():
 
 suppress_pygame_init()
 
+music_queue = Queue()
+is_paused = False
+current_song = None
+playing_thread = None
+
 def play_mp3(file_path):
+    global is_paused, current_song, playing_thread
+
     pygame.mixer.music.load(file_path)
     pygame.mixer.music.play()
-    print("🎧 Now playing...")
+    print(f"🎧 Now playing: {file_path}")
 
     while pygame.mixer.music.get_busy():
         time.sleep(0.5)
+
+    if not music_queue.empty() and not is_paused:
+        next_song = music_queue.get()
+        playing_thread = threading.Thread(target=play_mp3, args=(next_song,))
+        playing_thread.daemon = True
+        playing_thread.start()
+
+    else:
+        print("🎶 Playlist finished!")
 
 def play_song(song_name):
     print(f"🔍 Searching for: {song_name}")
@@ -62,16 +79,103 @@ def play_song(song_name):
         print(f"❌ Failed to download song: {e}")
         return
 
-    print(f"✅ Downloaded! Saving as {song_filename} in './music' folder... Starting playback...")
-    play_mp3(song_playpath)
+    print(f"✅ Downloaded! Saving as {song_filename} in './music' folder...")
+
+    music_queue.put(song_playpath)
+
+    if not pygame.mixer.music.get_busy() and not is_paused:
+        playing_thread = threading.Thread(target=play_mp3, args=(song_playpath,))
+        playing_thread.daemon = True
+        playing_thread.start()
+
+def pause_music():
+    global is_paused
+    if pygame.mixer.music.get_busy():
+        pygame.mixer.music.pause()
+        is_paused = True
+        print("⏸️ Music paused.")
+    else:
+        print("❌ No music is playing to pause.")
+
+def resume_music():
+    global is_paused
+    if is_paused:
+        pygame.mixer.music.unpause()
+        is_paused = False
+        print("▶️ Music resumed.")
+    else:
+        print("❌ Music is not paused.")
+
+def stop_music():
+    pygame.mixer.music.stop()
+    global is_paused, playing_thread
+    is_paused = False
+    playing_thread = None
+    print("❌ Music stopped and playlist cleared.")
+
+    while not music_queue.empty():
+        music_queue.get()
+
+def next_song():
+    global is_paused, playing_thread
+    if pygame.mixer.music.get_busy():
+        print("⏭️ Skipping to next song...")
+        pygame.mixer.music.stop()
+
+        if not music_queue.empty():
+            next_song_path = music_queue.get()
+            playing_thread = threading.Thread(target=play_mp3, args=(next_song_path,))
+            playing_thread.daemon = True
+            playing_thread.start()
+
+        else:
+            print("❌ No more songs in the queue.")
+    else:
+        print("❌ No song is playing to skip.")
+
+def find_song_in_queue(song_name):
+    """
+    Check if the song name is partially or fully contained in any of the songs in the queue.
+    """
+    for song in list(music_queue.queue):
+        if song_name.lower() in song.lower():
+            return song
+    return None
 
 if __name__ == "__main__":
     while True:
 
-        song = input("Enter the name of the song you want to play (or type 'exit' to quit): ")
+        command = input("Enter a command (play, pause, resume, stop, next, find <song_name>, or 'exit' to quit): ").lower()
 
-        if song.lower() == 'exit':
+        if command == 'exit':
             print("Goodbye!")
             break
 
-        play_song(song)
+        elif command.startswith("play "):
+            song_name = command[5:]
+            play_song(song_name)
+
+        elif command == 'pause':
+            pause_music()
+
+        elif command == 'resume':
+            resume_music()
+
+        elif command == 'stop':
+            stop_music()
+
+        elif command == 'next':
+            next_song()
+
+        elif command.startswith("find "):
+            song_name = command[5:]
+            found_song = find_song_in_queue(song_name)
+            if found_song:
+                print(f"✅ Found: {found_song}")
+                pygame.mixer.music.load(found_song)
+                pygame.mixer.music.play()
+            else:
+                print(f"❌ No song found containing '{song_name}'.")
+
+        else:
+            print("❌ Invalid command. Try again.")
