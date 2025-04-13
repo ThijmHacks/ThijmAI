@@ -29,7 +29,7 @@ current_song = None
 playing_thread = None
 
 def play_mp3(file_path):
-    global is_paused, current_song, playing_thread
+    global is_paused, current_song, playing_thread, playlist_first
 
     pygame.mixer.music.load(file_path)
     pygame.mixer.music.play()
@@ -48,6 +48,7 @@ def play_mp3(file_path):
         print("🎶 Playlist finished!")
 
 def play_song(song_name):
+    global playlist_first
     print(f"🔍 Searching for: {song_name}")
 
     music_folder = os.path.join(os.getcwd(), "music")
@@ -87,6 +88,7 @@ def play_song(song_name):
         playing_thread = threading.Thread(target=play_mp3, args=(song_playpath,))
         playing_thread.daemon = True
         playing_thread.start()
+        playlist_first = True
 
 def pause_music():
     global is_paused
@@ -117,11 +119,13 @@ def stop_music():
         music_queue.get()
 
 def next_song():
-    global is_paused, playing_thread
+    global is_paused, playing_thread, playlist_first
     if pygame.mixer.music.get_busy():
         print("⏭️ Skipping to next song...")
         pygame.mixer.music.stop()
-
+        if playlist_first:
+            next_song()
+            playlist_first = False
         if not music_queue.empty():
             next_song_path = music_queue.get()
             playing_thread = threading.Thread(target=play_mp3, args=(next_song_path,))
