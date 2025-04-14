@@ -183,3 +183,37 @@ if __name__ == "__main__":
 
         else:
             print("❌ Invalid command. Try again.")
+
+def music(command):
+    if command == 'exit':
+        print("Goodbye!")
+        return
+
+    elif command.startswith("play "):
+        song_name = command[5:]
+        play_song(song_name)
+
+    elif command == 'pause':
+        pause_music()
+
+    elif command == 'resume':
+        resume_music()
+
+    elif command == 'stop':
+        stop_music()
+
+    elif command == 'next':
+        next_song()
+
+    elif command.startswith("find "):
+        song_name = command[5:]
+        found_song = find_song_in_queue(song_name)
+        if found_song:
+            print(f"✅ Found: {found_song}")
+            pygame.mixer.music.load(found_song)
+            pygame.mixer.music.play()
+        else:
+            print(f"❌ No song found containing '{song_name}'.")
+
+    else:
+        print("❌ Invalid command. Try again.")
